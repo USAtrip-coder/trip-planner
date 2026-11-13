@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Trip Planner</title>
+<meta name="theme-color" content="#9a3412">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Trip Planner">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f1e9;--card:#fffdf9;--ink:#1c1917;--muted:#78716c;--line:#e7dfd3;--soft:#f1ebe1;--accent:#c2410c;--accent-ink:#9a3412;--teal:#0f766e;--warn:#b45309;--warn-bg:#fef3c7;--bad:#b91c1c;--bad-bg:#fee2e2;--good:#15803d;--good-bg:#dcfce7;--r:12px}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "DM Sans",system-ui,sans-serif}
+h1,h2,h3{margin:0;font-weight:700}
+h2{font:1.45rem "DM Serif Display",Georgia,serif;letter-spacing:.2px}
+h3{font-size:1rem}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--teal)}
+.hero{background:linear-gradient(115deg,#431407 0%,#9a3412 38%,#ea580c 72%,#f59e0b 100%);color:#fff7ed;padding:calc(22px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) 18px calc(20px + env(safe-area-inset-left));position:relative;overflow:hidden}
+#fab{bottom:calc(18px + env(safe-area-inset-bottom))!important}
+.hero:after{content:"";position:absolute;right:-40px;bottom:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,#fde68a55,transparent 65%)}
+.hero-in{max-width:1180px;margin:0 auto;display:flex;gap:16px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;position:relative;z-index:1}
+.hero h1{font:2rem/1.1 "DM Serif Display",Georgia,serif}
+.hero .sub{opacity:.9;margin-top:4px}
+.countdown{text-align:right}
+.countdown b{font:2.2rem/1 "DM Serif Display",serif;display:block}
+.curtog{display:inline-flex;background:#0003;border-radius:99px;padding:3px;margin-top:8px}
+.curtog button{border:0;background:none;color:#fff;padding:4px 12px;border-radius:99px;cursor:pointer;font-weight:600;font-size:.85rem}
+.curtog button.on{background:#fff;color:var(--accent-ink)}
+.viewsel{background:#0003;color:#fff;border:0;border-radius:99px;padding:6px 12px;font-weight:600;font-size:.85rem;cursor:pointer}
+.viewsel option{color:#1c1917}
+.profile{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;background:#fff}
+.qchips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+nav{position:sticky;top:0;z-index:20;background:var(--card);border-bottom:1px solid var(--line)}
+.tabs{max-width:1180px;margin:0 auto;display:flex;overflow-x:auto;scrollbar-width:none;padding:0 12px}
+.tabs a{padding:13px 14px;text-decoration:none;color:var(--muted);font-weight:600;white-space:nowrap;border-bottom:3px solid transparent}
+.tabs a.on{color:var(--accent-ink);border-color:var(--accent)}
+main{max-width:1180px;margin:0 auto;padding:20px 16px 110px}
+.banner{max-width:1180px;margin:10px auto 0;padding:8px 14px;border-radius:10px;font-size:.9rem;background:var(--warn-bg);color:#78350f}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.card h3{margin-bottom:10px}
+.tile .lbl{color:var(--muted);font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.tile .val{font:1.75rem/1.15 "DM Serif Display",serif;margin-top:4px}
+.tile .note{color:var(--muted);font-size:.85rem;margin-top:2px}
+.tile.accent{background:linear-gradient(140deg,#fff7ed,#ffedd5);border-color:#fed7aa}
+.sec{margin-top:22px}
+.sec>.row{margin-bottom:10px}
+.btn{border:1px solid var(--line);background:var(--card);padding:7px 13px;border-radius:9px;cursor:pointer;font-weight:600;font-size:.9rem;white-space:nowrap}
+.btn:hover{border-color:#d6c8b4}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.pri:hover{background:var(--accent-ink)}
+.btn.sm{padding:3px 9px;font-size:.8rem}
+.btn.danger{color:var(--bad)}
+.btn.ghost{border-color:transparent;background:none}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th{text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700;padding:9px 10px;border-bottom:1px solid var(--line);background:var(--soft);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+tbody tr.click{cursor:pointer}
+tbody tr.click:hover{background:#fbf6ee}
+tfoot td{font-weight:700;background:var(--soft);border-top:1px solid var(--line)}
+.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.small{font-size:.82rem}
+.nowrap{white-space:nowrap}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:.75rem;font-weight:700;white-space:nowrap}
+.p-Idea{background:#e7e5e4;color:#44403c}
+.p-Booked{background:#dbeafe;color:#1e40af}
+.p-Paid{background:var(--good-bg);color:var(--good)}
+.p-Cancelled{background:var(--bad-bg);color:var(--bad);text-decoration:line-through}
+.tag{display:inline-block;padding:1px 7px;border-radius:6px;font-size:.72rem;font-weight:700;background:var(--soft);color:var(--muted);margin-left:4px;vertical-align:1px}
+.tag.auto{background:#ccfbf1;color:var(--teal)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:0}
+.ok{color:var(--good);font-weight:600}
+.warn{color:var(--warn);font-weight:600}
+.bad{color:var(--bad);font-weight:600}
+.alert{display:flex;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:.9rem}
+.alert:last-child{border:0}
+.alert .ic{flex:0 0 22px;text-align:center}
+.bars .b{display:grid;grid-template-columns:150px 1fr 110px;gap:10px;align-items:center;margin:7px 0;font-size:.88rem}
+.bar{height:16px;background:var(--soft);border-radius:5px;position:relative;overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;border-radius:5px}
+.bar i.act{height:6px;top:auto;bottom:0;background:#1c1917cc}
+.chart{display:flex;align-items:flex-end;gap:3px;height:120px;padding-top:6px}
+.chart .c{flex:1;background:#fdba74;border-radius:3px 3px 0 0;min-height:2px;position:relative}
+.chart .c.long{background:var(--accent)}
+.chart .c.zero{background:var(--line)}
+.chart-x{display:flex;gap:3px;font-size:.65rem;color:var(--muted);margin-top:3px}
+.chart-x span{flex:1;text-align:center;overflow:hidden}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-top:8px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:4px 11px;font-size:.82rem;font-weight:600;cursor:pointer}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.person{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line)}
+.person:last-child{border:0}
+.daybk{padding:3px 7px;margin:2px 0;border-radius:7px;background:var(--soft);cursor:pointer;display:inline-block}
+.daybk:hover{background:#efe6d8}
+.day-long td:first-child{box-shadow:inset 3px 0 var(--accent)}
+.day-missing td{background:repeating-linear-gradient(135deg,#fff,#fff 8px,#faf5ee 8px,#faf5ee 16px);color:var(--muted)}
+.chk{width:18px;height:18px;accent-color:var(--teal);cursor:pointer}
+.task-done td{color:var(--muted);text-decoration:line-through}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form .full{grid-column:1/-1}
+.field label{display:block;font-size:.78rem;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.field input:not([type=checkbox]),.field select,.field textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.field textarea{min-height:70px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid #fdba74;border-color:#fdba74}
+.field .hint{font-size:.78rem;color:var(--muted);margin-top:3px}
+.cbline{display:flex;gap:8px;align-items:center;font-size:.9rem}
+.splitbox{display:flex;gap:12px;flex-wrap:wrap}
+#modal{position:fixed;inset:0;z-index:50;background:#1c191766;display:flex;align-items:flex-start;justify-content:center;padding:5vh 12px;overflow-y:auto}
+#modal[hidden]{display:none}
+.dialog{background:var(--card);border-radius:16px;max-width:640px;width:100%;padding:20px;box-shadow:0 20px 60px #0004}
+.dialog h2{margin-bottom:14px}
+.dialog .foot{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.dialog .foot .left{margin-right:auto}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:9px 16px;border-radius:10px;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
+#toast.show{opacity:1}
+#fab{position:fixed;right:18px;bottom:18px;z-index:30;border:0;background:var(--accent);color:#fff;font-weight:700;padding:13px 18px;border-radius:99px;box-shadow:0 8px 24px #9a341255;cursor:pointer}
+#fab[hidden]{display:none}
+.setup .field{margin-bottom:12px}
+.trav{display:flex;gap:8px;margin-bottom:8px}
+.trav input{flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:8px}
+textarea.code{width:100%;min-height:220px;font:12px/1.4 ui-monospace,Menlo,monospace;padding:10px;border:1px solid var(--line);border-radius:8px}
+.dp{position:relative}
+.dp-btn{width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer}
+.dp-btn:hover,.dp-btn.open{border-color:#fdba74;outline:2px solid #fed7aa}
+#dp{position:fixed;z-index:70;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 40px #0003;padding:10px;width:286px}
+#dp[hidden]{display:none}
+.dp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.dp-head b{font-size:.95rem}
+.dp-head button,.dp-foot button{border:1px solid var(--line);background:var(--card);border-radius:8px;cursor:pointer;font-weight:600}
+.dp-head button{width:34px;height:30px;font-size:1.1rem}
+.dp-wd,.dp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.dp-wd span{font-size:.7rem;color:var(--muted);font-weight:700;padding:3px 0}
+.dp-grid button{height:34px;border:0;background:none;border-radius:8px;cursor:pointer;font-size:.88rem}
+.dp-grid button:hover{background:var(--soft)}
+.dp-grid button.trip{background:#fff7ed;color:var(--accent-ink)}
+.dp-grid button.today{box-shadow:inset 0 0 0 1.5px var(--teal)}
+.dp-grid button.sel{background:var(--accent);color:#fff;font-weight:700}
+.dp-foot{display:flex;gap:6px;justify-content:space-between;margin-top:8px}
+.dp-foot button{padding:4px 10px;font-size:.8rem}
+@media (max-width:640px){.form{grid-template-columns:1fr}.bars .b{grid-template-columns:100px 1fr 80px}.hero h1{font-size:1.6rem}.countdown{text-align:left}}
+</style>
+</head>
+<body>
+<header class="hero"><div class="hero-in" id="hero"></div></header>
+<nav><div class="tabs" id="tabs"></div></nav>
+<div id="banner"></div>
+<main id="main"><div class="empty">Loading your trip…</div></main>
+<div id="modal" hidden></div>
+<div id="toast"></div>
+<div id="dp" hidden></div>
+<button id="fab" hidden>+ Expense</button>
+<script src="firebase-config.js"></script>
+<script src="fb.js"></script>
+<script>
+"use strict";
+/* ---------- constants ---------- */
+const CATS=[
+ {k:'Flights',c:'#2563eb'},{k:'Accommodation',c:'#7c3aed'},{k:'Car & Fuel',c:'#c2410c'},
+ {k:'Food & Drink',c:'#d97706'},{k:'Activities & Parks',c:'#059669'},{k:'Wedding',c:'#db2777'},
+ {k:'Shopping',c:'#0891b2'},{k:'Insurance & Admin',c:'#64748b'},{k:'Other',c:'#a8a29e'}];
+const CATC=Object.fromEntries(CATS.map(c=>[c.k,c.c]));
+const BTYPES=['Flight','Hotel','Car hire','Activity','Food','Wedding','Other'];
+const BTYPE_CAT={Flight:'Flights',Hotel:'Accommodation','Car hire':'Car & Fuel',Activity:'Activities & Parks',Food:'Food & Drink',Wedding:'Wedding',Other:'Other'};
+const BICON={Flight:'✈️',Hotel:'🛏️','Car hire':'🚗',Activity:'🎟️',Food:'🍽️',Wedding:'💍',Other:'📌'};
+const STATUSES=['Idea','Booked','Paid','Cancelled'];
+const COLS=['days','bookings','budget','expenses','tasks'];
+const TABS=[['overview','Overview'],['itinerary','Itinerary'],['bookings','Bookings & hotels'],['forecast','Cost forecast'],['expenses','Expenses'],['settle','Per person & settle up'],['checklist','Checklist'],['setup','Trip setup']];
+const DEFAULT_SETTINGS={name:'USA Road Trip',start:'2027-06-01',end:'2027-07-01',travellers:[{id:'t1',name:'Traveller 1',party:'p1'}],parties:[{id:'p1',name:''}],audPerUsd:1.45,fuelPrice:4.6,mpg:25,localPct:15,nightEst:200,longDrive:5,fuelSplitBy:'person'};
+const SPLITBY_OPT=[['person','Equally per person'],['party','Equally per profile (a couple pays one share)']];
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4);
+const num=v=>{const n=parseFloat(v);return isFinite(n)?n:0};
+const D=s=>{if(!s||!/^\d{4}-\d\d-\d\d$/.test(s))return null;const[y,m,d]=s.split('-').map(Number);return new Date(Date.UTC(y,m-1,d))};
+const iso=d=>d.toISOString().slice(0,10);
+const addD=(s,n)=>{const d=D(s);if(!d)return '';d.setUTCDate(d.getUTCDate()+n);return iso(d)};
+const diffD=(a,b)=>Math.round((D(b)-D(a))/864e5);
+const WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const fd=s=>{const d=D(s);return d?`${WD[d.getUTCDay()]} ${d.getUTCDate()} ${MO[d.getUTCMonth()]}`:''};
+const fdy=s=>{const d=D(s);return d?`${d.getUTCDate()} ${MO[d.getUTCMonth()]} ${d.getUTCFullYear()}`:''};
+const todayISO=()=>{const n=new Date();return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`};
+const safeUrl=u=>/^https?:\/\//i.test(u||'')?u:'';
+const lsGet=k=>{try{return localStorage.getItem('trip.'+k)}catch(e){return null}};
+const lsSet=(k,v)=>{try{localStorage.setItem('trip.'+k,v)}catch(e){}};
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),2600)}
+
+/* ---------- state ---------- */
+let S={settings:null,days:[],bookings:[],budget:[],expenses:[],tasks:[]};
+let mode='loading', db=null, readOnly=false, stale=false;
+const got={};
+let dispCur=lsGet('disp')||'AUD';
+let tab=(location.hash||'#overview').slice(1); if(!TABS.some(t=>t[0]===tab))tab='overview';
+const F={bType:'',bStatus:'',eCat:'',eWho:''};
+
+const ST=()=>Object.assign({},DEFAULT_SETTINGS,S.settings||{});
+const T=()=>ST().travellers||[];
+const tname=id=>(T().find(t=>t.id===id)||{}).name||'—';
+const fx=()=>num(ST().audPerUsd)||1.45;
+function conv(a,cur){a=num(a);if(!cur||cur===dispCur)return a;return cur==='USD'?a*fx():a/fx()}
+function money(v,dec=0){const p=dispCur==='AUD'?'A$':'US$';const n=Math.abs(v);return (v<0?'−':'')+p+n.toLocaleString('en-AU',{minimumFractionDigits:dec,maximumFractionDigits:dec})}
+function orig(a,cur){return (cur==='AUD'?'A$':'US$')+num(a).toLocaleString('en-AU',{maximumFractionDigits:2})}
+function splitOf(item){const ids=T().map(t=>t.id);const s=(item.split||[]).filter(x=>ids.includes(x));return s.length?s:ids}
+/* profiles (parties): a couple travelling together, or a single traveller */
+function partyOf(tid){const t=T().find(x=>x.id===tid);if(!t)return null;return t.party&&(ST().parties||[]).some(p=>p.id===t.party)?t.party:'solo-'+tid}
+function P(){const ps=ST().parties||[];return [...new Set(T().map(t=>partyOf(t.id)))].map(id=>({id,name:(ps.find(p=>p.id===id)||{}).name||''}))}
+function members(pid){return T().filter(t=>partyOf(t.id)===pid).map(t=>t.id)}
+function pname(pid){const p=P().find(x=>x.id===pid);return (p&&p.name)||members(pid).map(tname).join(' & ')||'—'}
+function partiesIn(ids){return [...new Set(ids.map(partyOf).filter(Boolean))]}
+function splitLabel(item){const s=splitOf(item);let l;if(s.length===T().length)l='Everyone';else{const ps=partiesIn(s);l=ps.every(p=>members(p).every(id=>s.includes(id)))?ps.map(pname).join(' + '):s.map(tname).join(', ')}return l+(item.splitBy==='party'&&partiesIn(s).length>1?' · per profile':'')}
+function normSettings(st){st={...st};const ts=(st.travellers||[]).map(t=>({...t,party:partyOf(t.id)||t.party||('solo-'+t.id)}));const old=Object.fromEntries((st.parties||[]).map(p=>[p.id,p]));
+  st.travellers=ts;st.parties=[...new Set(ts.map(t=>t.party))].map(id=>({...(old[id]||{}),id,name:(old[id]||{}).name||''}));return st}
+let viewP=lsGet('view')||'';
+const VP=()=>P().some(p=>p.id===viewP)?viewP:'';
+
+/* ---------- storage ---------- */
+const chains={};
+function pathFor(col,id){return col==='settings'?'trip/settings':`${col}/${id}`}
+function handleErr(e){
+  const code=e&&e.code;
+  if(code==='invalid_argument'||code==='not_granted'){readOnly=true;toast('You have view-only access to this trip');render(true)}
+  else if(code==='quota_exceeded')toast('Storage is full — delete some old entries');
+  else toast('Could not save — check your connection');
+  console.warn(e);
+}
+function save(col,obj){
+  if(readOnly){toast('View-only access');return}
+  const clean=JSON.parse(JSON.stringify(obj));const id=clean.id||uid();delete clean.id;
+  if(col==='settings'){S.settings=clean}else{const arr=S[col];const i=arr.findIndex(x=>x.id===id);const rec={...clean,id};if(i>=0)arr[i]=rec;else arr.push(rec)}
+  if(mode==='db'){
+    const p=pathFor(col,id);
+    const run=()=>db.doc(p).set(clean).catch(e=>{if(e&&e.code==='unavailable')return new Promise(r=>setTimeout(r,400+Math.random()*600)).then(()=>db.doc(p).set(clean));throw e});
+    chains[p]=(chains[p]||Promise.resolve()).then(run).catch(handleErr);
+  }else persistLocal();
+  render();
+}
+function remove(col,id){
+  if(readOnly){toast('View-only access');return}
+  S[col]=S[col].filter(x=>x.id!==id);
+  if(mode==='db'){const p=pathFor(col,id);chains[p]=(chains[p]||Promise.resolve()).then(()=>db.doc(p).delete()).catch(handleErr)}
+  else persistLocal();
+  render();
+}
+function persistLocal(){lsSet('data',JSON.stringify(S))}
+function startLocal(reason){
+  mode='local';
+  try{const d=JSON.parse(lsGet('data')||'null');if(d)S=Object.assign(S,d)}catch(e){}
+  $('#banner').innerHTML=`<div class="banner">${esc(reason)} Changes are being saved in this browser only.</div>`;
+  render(true);
+}
+async function init(){
+  render(true);
+  if(!window.TripCloud||!TripCloud.configured){startLocal('The sync database isn’t set up yet.');return}
+  if(!TripCloud.tripId()){mode='landing';render(true);return}
+  try{db=await window.claude.use('db')}catch(e){db=null}
+  if(!db){startLocal('Couldn’t open the sync database.');return}
+  mode='db';
+  try{const user=await window.claude.use('user');if(user&&user.can){const c=await user.can('data.write');if(c===false)readOnly=true}}catch(e){}
+  const timer=setTimeout(()=>{stale=true;render(true)},10000);
+  const mark=(k,meta)=>{got[k]=got[k]||!meta.fromCache;if(['settings',...COLS].every(x=>got[x])){clearTimeout(timer);stale=false}};
+  const onErr=e=>{clearTimeout(timer);if(e&&e.code==='revoked'){readOnly=true}console.warn(e);render(true)};
+  db.doc('trip/settings').onSnapshot(s=>{S.settings=s.exists?{...s.data()}:null;got.settingsAny=true;mark('settings',s.metadata);render()},onErr);
+  COLS.forEach(c=>db.collection(c).onSnapshot(q=>{S[c]=q.docs.map(d=>({...d.data(),id:d.id}));got[c+'Any']=true;mark(c,q.metadata);render()},onErr));
+}
+
+/* ---------- computations ---------- */
+const sortDays=()=>[...S.days].sort((a,b)=>(a.date||'').localeCompare(b.date||'')||(a.order||0)-(b.order||0));
+const totalMiles=()=>S.days.reduce((s,d)=>s+num(d.miles),0);
+const totalHours=()=>S.days.reduce((s,d)=>s+num(d.hours),0);
+function hotelsFor(date){return S.bookings.filter(b=>b.type==='Hotel'&&b.status!=='Cancelled'&&b.start&&b.end&&b.start<=date&&date<b.end)}
+/* each night: which profiles still have no room booked */
+function nightsInfo(){
+  const st=ST();const out=[];
+  sortDays().forEach(d=>{if(!d.date||d.date>=st.end)return;const hotels=hotelsFor(d.date);if(!d.night&&!hotels.length)return;const night=d.night||hotels[0].location||hotels[0].title;const cov=new Set();hotels.forEach(h=>splitOf(h).forEach(id=>cov.add(partyOf(id))));
+    const missing=d.noHotel?[]:P().map(p=>p.id).filter(p=>!cov.has(p));out.push({day:d,night,hotels,missing,need:missing.length>0})});
+  return out;
+}
+function fuelCalc(){const st=ST();const mi=totalMiles()*(1+num(st.localPct)/100);const gal=num(st.mpg)?mi/num(st.mpg):0;return{mi,gal,usd:gal*num(st.fuelPrice)}}
+function forecast(){
+  const st=ST();const items=[];
+  S.bookings.forEach(b=>{if(b.status==='Cancelled')return;items.push({src:'booking',id:b.id,cat:BTYPE_CAT[b.type]||'Other',label:b.title||b.type,kind:'fixed',on:true,amt:conv(b.cost,b.cur),split:splitOf(b),splitBy:b.splitBy,status:b.status,ref:b})});
+  S.bookings.forEach(b=>{if(b.status==='Cancelled'||b.type!=='Hotel'||b.breakfast!=='fee'||!b.bfAdd||!num(b.bfFee)||!b.start||!b.end)return;const nights=Math.max(0,diffD(b.start,b.end));const sp=splitOf(b);if(!nights)return;
+    items.push({src:'booking',id:b.id,cat:'Food & Drink',label:'Breakfast — '+(b.title||'hotel'),kind:'fixed',on:true,amt:conv(num(b.bfFee)*nights*sp.length,b.cur),split:sp,splitBy:'person',status:b.status,ref:b,calc:`${orig(b.bfFee,b.cur)} pp × ${nights} night${nights>1?'s':''} × ${sp.length} ${sp.length>1?'people':'person'}`})});
+  S.budget.forEach(l=>{const own=l.owner&&P().some(p=>p.id===l.owner)?l.owner:null;
+    if(own){const mem=members(own);const n=l.per==='person'?mem.length:1;const q=l.qty===undefined||l.qty===''?1:num(l.qty);
+      items.push({src:'budget',id:l.id,owner:own,cat:l.cat||'Other',label:l.item,kind:l.kind==='optional'?'optional':'fixed',on:l.kind==='optional'?l.on!==false:true,amt:conv(num(l.amount)*q*n,l.cur),split:mem,splitBy:'person',ref:l,
+        calc:`${orig(l.amount,l.cur)}${q!==1?' × '+q:''}${n>1?' × '+n+' people':''}`});return}
+    const per=perOf(l);const sp=splitOf(l);const n=per==='person'?sp.length:per==='party'?partiesIn(sp).length:1;const q=l.qty===undefined||l.qty===''?1:num(l.qty);
+    items.push({src:'budget',id:l.id,cat:l.cat||'Other',label:l.item,kind:l.kind==='optional'?'optional':'fixed',on:l.kind==='optional'?l.on!==false:true,amt:conv(num(l.amount)*q*n,l.cur),split:sp,splitBy:per==='party'?'party':l.splitBy,ref:l,
+    calc:`${orig(l.amount,l.cur)}${q!==1?' × '+q:''}${per==='person'?' × '+n+' people':per==='party'?' × '+n+' profile'+(n>1?'s':''):''}`})});
+  const f=fuelCalc();
+  if(f.usd>0)items.push({src:'auto',id:'fuel',cat:'Car & Fuel',label:'Fuel (from itinerary miles)',kind:'fixed',on:true,amt:conv(f.usd,'USD'),split:T().map(t=>t.id),splitBy:st.fuelSplitBy==='party'?'party':'person',
+    calc:`${Math.round(totalMiles()).toLocaleString()} mi + ${num(st.localPct)}% local ÷ ${num(st.mpg)} mpg × US$${num(st.fuelPrice).toFixed(2)}/gal`});
+  const ni=nightsInfo();
+  P().forEach(p=>{const unb=ni.filter(x=>x.missing.includes(p.id)).length;const est=nightEstFor(p.id);if(unb>0)items.push({src:'auto',id:'nights-'+p.id,cat:'Accommodation',label:`Hotels not yet booked — ${pname(p.id)} (${unb} night${unb>1?'s':''})`,kind:'fixed',on:true,amt:conv(unb*est,'USD'),split:members(p.id),
+    calc:`${unb} nights × US$${est} per room — shrinks as rooms are booked`})});
+  return items;
+}
+function nightEstFor(pid){const p=(ST().parties||[]).find(x=>x.id===pid);return p&&num(p.nightEst)?num(p.nightEst):num(ST().nightEst)}
+function perOf(l){return l.per!==undefined?l.per:(l.perPerson?'person':'')}
+function totals(items){
+  const t={fixed:0,optOn:0,optAll:0,committed:0};
+  items.forEach(i=>{if(i.kind==='fixed')t.fixed+=i.amt;else{t.optAll+=i.amt;if(i.on)t.optOn+=i.amt}if(i.src==='booking'&&(i.status==='Booked'||i.status==='Paid')&&(i.kind==='fixed'||i.on))t.committed+=i.amt});
+  t.planned=t.fixed+t.optOn;return t;
+}
+/* who pays what for one item: per person, or each profile an equal share then split inside the profile */
+function itemShares(i){const m={};const s=(i.split||[]).filter(id=>partyOf(id));if(!s.length)return m;
+  if(i.splitBy==='party'){const ps=partiesIn(s);ps.forEach(pid=>{const mem=s.filter(id=>partyOf(id)===pid);mem.forEach(id=>m[id]=(m[id]||0)+i.amt/ps.length/mem.length)})}
+  else s.forEach(id=>m[id]=(m[id]||0)+i.amt/s.length);return m}
+function shares(items){const m={};T().forEach(t=>m[t.id]=0);items.forEach(i=>{const sh=itemShares(i);for(const k in sh)if(k in m)m[k]+=sh[k]});return m}
+function byParty(m){const o={};P().forEach(p=>o[p.id]=0);for(const k in m){const p=partyOf(k);if(p in o)o[p]+=m[k]}return o}
+const partyShare=(i,pid)=>{const sh=itemShares(i);return members(pid).reduce((s,id)=>s+(sh[id]||0),0)};
+/* when viewing one profile, every cost becomes that profile's share (full cost kept as .full) */
+function scope(items){const V=VP();if(!V)return items;return items.map(i=>({...i,full:i.amt,amt:partyShare(i,V)})).filter(i=>i.amt>0.005)}
+function expShare(e){const V=VP();return V?partyShare(expItem(e),V):expAmt(e)}
+function bookShare(b){const V=VP();const c=conv(b.cost,b.cur);return V?partyShare({amt:c,split:splitOf(b),splitBy:b.splitBy},V):c}
+const planItems=items=>items.filter(i=>i.kind==='fixed'||i.on);
+const expAmt=e=>conv(e.amount,e.cur);
+const spentTotal=()=>S.expenses.reduce((s,e)=>s+expAmt(e),0);
+function bookingPaid(b){return S.expenses.filter(e=>e.bookingId===b.id).reduce((s,e)=>s+expAmt(e),0)}
+const expItem=e=>({amt:expAmt(e),split:splitOf(e),splitBy:e.splitBy});
+/* balances per profile: a couple's payments and shares are pooled */
+function balances(){
+  const m={};P().forEach(p=>m[p.id]={paid:0,share:0});
+  S.expenses.forEach(e=>{const a=expAmt(e);const pp=partyOf(e.paidBy);if(m[pp])m[pp].paid+=a;const sh=itemShares(expItem(e));for(const id in sh){const p=partyOf(id);if(m[p])m[p].share+=sh[id]}});
+  return m;
+}
+function paidByPerson(){const m={};T().forEach(t=>m[t.id]=0);S.expenses.forEach(e=>{if(e.paidBy in m)m[e.paidBy]+=expAmt(e)});return m}
+function settleUp(){
+  const b=balances();const pos=[],neg=[];
+  Object.entries(b).forEach(([id,v])=>{const n=v.paid-v.share;if(n>0.5)pos.push({id,n});else if(n<-0.5)neg.push({id,n:-n})});
+  pos.sort((a,b)=>b.n-a.n);neg.sort((a,b)=>b.n-a.n);const tx=[];
+  let i=0,j=0;while(i<neg.length&&j<pos.length){const x=Math.min(neg[i].n,pos[j].n);tx.push({from:neg[i].id,to:pos[j].id,amt:x});neg[i].n-=x;pos[j].n-=x;if(neg[i].n<0.5)i++;if(pos[j].n<0.5)j++}
+  return tx;
+}
+const miKm=mi=>`${Math.round(mi).toLocaleString()} mi <span class="muted">· ${Math.round(mi*1.609).toLocaleString()} km</span>`;
+const hrs=h=>{h=num(h);if(!h)return '';const H=Math.floor(h),M=Math.round((h-H)*60);return `${H}h${M?(' '+M+'m'):''}`};
+const mapUrl=(a,b)=>`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(a)}&destination=${encodeURIComponent(b)}&travelmode=driving`;
+
+/* ---------- render ---------- */
+let pending=false,rafId=0;
+function focusInMain(){const a=document.activeElement;return a&&$('#main').contains(a)&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)}
+function render(force){
+  if(!force&&focusInMain()){pending=true;return}
+  cancelAnimationFrame(rafId);rafId=requestAnimationFrame(doRender);
+}
+document.addEventListener('focusout',()=>setTimeout(()=>{if(pending&&!focusInMain()){pending=false;render(true)}},0));
+function doRender(){
+  renderHero();
+  $('#tabs').innerHTML=TABS.map(([k,l])=>`<a href="#${k}" class="${k===tab?'on':''}">${l}</a>`).join('');
+  $('#fab').hidden=readOnly||mode==='loading';
+  if(mode==='loading'){$('#main').innerHTML='<div class="empty">Loading your trip…</div>';return}
+  if(mode==='landing'){$('#fab').hidden=true;$('#tabs').innerHTML='';$('#banner').innerHTML='';$('#main').innerHTML=vLanding();return}
+  if(mode==='db'&&!navigator.onLine)$('#banner').innerHTML='<div class="banner">📴 You’re offline. Showing the copy saved on this device. Anything you change is saved here and syncs when you’re back online.</div>';
+  else if(stale&&mode==='db')$('#banner').innerHTML='<div class="banner">Still connecting to the server. What you see may be out of date.</div>';
+  else if(mode==='db')$('#banner').innerHTML=readOnly?'<div class="banner">You have view-only access to this trip.</div>':'';
+  if(mode==='db'&&!S.settings&&got.settingsAny&&COLS.every(c=>got[c+'Any'])&&COLS.every(c=>!S[c].length)){$('#main').innerHTML=vWelcome();return}
+  const v={overview:vOverview,itinerary:vItinerary,bookings:vBookings,forecast:vForecast,expenses:vExpenses,settle:vSettle,checklist:vChecklist,setup:vSetup}[tab];
+  $('#main').innerHTML=v();
+}
+function renderHero(){
+  if(mode==='landing'){$('#hero').innerHTML='<div><h1>Trip Planner</h1><div class="sub">Routes, bookings and costs, together. Works offline.</div></div>';return}
+  const st=ST();const n=st.start&&st.end?diffD(st.start,st.end):0;const td=todayISO();
+  let cd='';if(st.start){const k=diffD(td,st.start);if(k>0)cd=`<b>${k}</b>days to go`;else if(st.end&&td<=st.end)cd=`<b>Day ${diffD(st.start,td)+1}</b>of ${n+1}`;else cd=`<b>Home</b>trip complete`}
+  $('#hero').innerHTML=`<div><h1>${esc(st.name)}</h1><div class="sub">${fdy(st.start)} → ${fdy(st.end)} · ${n} nights · ${T().length} traveller${T().length===1?'':'s'} · ${miKm(totalMiles()).replace('class="muted"','')}</div></div>
+  <div class="countdown">${cd}<div class="row" style="justify-content:flex-end;gap:8px;margin-top:8px"><select class="viewsel" data-act="view" title="Show costs for one profile">${[['','Viewing: everyone'],...P().map(p=>[p.id,'Viewing: '+pname(p.id)])].map(([v,l])=>`<option value="${esc(v)}" ${VP()===v?'selected':''}>${esc(l)}</option>`).join('')}</select>
+  <div class="curtog" style="margin:0">${['AUD','USD'].map(c=>`<button data-act="cur" data-v="${c}" class="${dispCur===c?'on':''}">${c}</button>`).join('')}</div></div></div>`;
+}
+function vLanding(){return `<div class="card" style="max-width:560px;margin:30px auto"><h2>Trip Planner</h2>
+  <p class="muted">Plan your route, bookings and costs together. Works offline once it’s on your phone.</p>
+  <button class="btn pri" data-act="trip-new">Create a new trip</button>
+  <div class="field" style="margin-top:20px"><label for="joinlink">Got an invite link?</label><div class="row" style="flex-wrap:nowrap"><input id="joinlink" placeholder="Paste the invite link here" style="flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:8px"><button class="btn" data-act="trip-join">Join</button></div></div></div>`}
+function vWelcome(){return `<div class="card" style="max-width:560px;margin:30px auto;text-align:center"><h2>Start planning</h2><p class="muted">No trip saved yet. Set up the basics and start adding days, bookings and costs.</p><button class="btn pri" data-act="init-blank">Create trip</button></div>`}
+
+/* Overview */
+function vOverview(){
+  const st=ST();const all=forecast();const V=VP();const items=scope(all);const t=totals(items);const pp=shares(planItems(all));const pb=byParty(pp);
+  const spent=S.expenses.reduce((s,e)=>s+expShare(e),0);const n=V?members(V).length:(T().length||1);
+  const nights=nightsInfo();const unb=nights.filter(x=>x.need&&(!V||x.missing.includes(V)));const td=todayISO();
+  const alerts=[];
+  unb.forEach(x=>{const miss=V?[V]:x.missing;alerts.push(['🛏️',`<b>${fd(x.day.date)}</b> — no room in ${esc(x.night)} for ${miss.map(p=>esc(pname(p))).join(', ')} <button class="btn sm" data-act="hotel-for" data-id="${x.day.id}" data-p="${miss[0]}">+ Add hotel</button>`])});
+  S.bookings.filter(b=>b.cancelBy&&b.status!=='Cancelled').sort((a,b)=>a.cancelBy.localeCompare(b.cancelBy)).forEach(b=>{const k=diffD(td,b.cancelBy);if(k<0)return;if(k<=45)alerts.push(['⏳',`Free cancellation on <b>${esc(b.title)}</b> ends ${fdy(b.cancelBy)} <span class="warn">(${k} day${k===1?'':'s'})</span>`])});
+  S.tasks.filter(x=>!x.done&&x.due).sort((a,b)=>a.due.localeCompare(b.due)).forEach(x=>{const k=diffD(td,x.due);if(k<0)alerts.push(['❗',`Overdue: <b>${esc(x.text)}</b> <span class="bad">(due ${fdy(x.due)})</span>`]);else if(k<=30)alerts.push(['☑️',`Due soon: <b>${esc(x.text)}</b> — ${fdy(x.due)}`])});
+  sortDays().filter(d=>num(d.hours)>num(st.longDrive)).forEach(d=>alerts.push(['🚗',`Long drive ${fd(d.date)}: ${esc(d.from)} → ${esc(d.to)} (${hrs(d.hours)}) — plan breaks / split if needed`]));
+  const ideas=S.bookings.filter(b=>b.status==='Idea').length;
+  if(ideas)alerts.push(['💡',`${ideas} booking${ideas>1?'s are':' is'} still at “Idea” stage — <a href="#bookings">review</a>`]);
+  const byCat={};CATS.forEach(c=>byCat[c.k]={plan:0,act:0});
+  planItems(items).forEach(i=>{(byCat[i.cat]||byCat.Other).plan+=i.amt});
+  S.expenses.forEach(e=>{(byCat[e.cat]||byCat.Other).act+=expShare(e)});
+  const max=Math.max(1,...Object.values(byCat).map(v=>Math.max(v.plan,v.act)));
+  const up=S.bookings.filter(b=>b.status!=='Cancelled'&&b.start&&(!V||splitOf(b).some(id=>partyOf(id)===V))).sort((a,b)=>a.start.localeCompare(b.start)).filter(b=>(b.end||b.start)>=td).slice(0,7);
+  const days=sortDays();const maxMi=Math.max(1,...days.map(d=>num(d.miles)));
+  return `
+  <div class="grid g4">
+   <div class="card tile accent"><div class="lbl">${V?'Planned cost — '+esc(pname(V)):'Planned trip cost'}</div><div class="val">${money(t.planned)}</div><div class="note">${n>1?money(t.planned/n)+(V?' each':' per person avg')+' · ':''}fixed + chosen extras</div></div>
+   <div class="card tile"><div class="lbl">Fixed costs</div><div class="val">${money(t.fixed)}</div><div class="note">Optional extras: ${money(t.optOn)} of ${money(t.optAll)} selected</div></div>
+   <div class="card tile"><div class="lbl">Booked so far</div><div class="val">${money(t.committed)}</div><div class="note">${t.planned?Math.round(t.committed/t.planned*100):0}% of plan locked in</div></div>
+   <div class="card tile"><div class="lbl">Spent / paid so far</div><div class="val">${money(spent)}</div><div class="note">${money(Math.max(0,t.planned-spent))} still to spend</div></div>
+  </div>
+  <div class="grid g2 sec">
+   <div class="card"><div class="row between"><h3>Needs attention</h3><span class="muted small">${alerts.length} item${alerts.length===1?'':'s'}</span></div>
+    ${alerts.length?alerts.slice(0,14).map(a=>`<div class="alert"><span class="ic">${a[0]}</span><span>${a[1]}</span></div>`).join('')+(alerts.length>14?`<div class="muted small">+${alerts.length-14} more</div>`:''):'<div class="muted">All clear — nothing urgent.</div>'}
+   </div>
+   <div class="card">${V?`<h3>Planned cost per person</h3>${members(V).map(id=>`<div class="person"><span>${esc(tname(id))}</span><b>${money(pp[id]||0)}</b></div>`).join('')}
+    <div class="muted small" style="margin-top:8px">Only costs ${esc(pname(V))} share in. Switch to “Viewing: everyone” in the header for the whole group.</div>`
+    :`<h3>Planned cost by profile</h3>${P().map(p=>{const m=members(p.id);return `<div class="person"><span>${esc(pname(p.id))}${m.length>1?` <span class="muted small">(${money((pb[p.id]||0)/m.length)} each)</span>`:''}</span><b>${money(pb[p.id]||0)}</b></div>`}).join('')}
+    <div class="muted small" style="margin-top:8px">Costs are split between the people tagged on them, per person or per profile. <a href="#settle">Full breakdown & settle up →</a></div>`}
+    <h3 style="margin-top:18px">Coming up</h3>
+    ${up.length?up.map(b=>`<div class="person"><span>${BICON[b.type]||''} ${esc(b.title)} <span class="pill p-${esc(b.status)}">${esc(b.status)}</span></span><span class="muted small nowrap">${fd(b.start)}</span></div>`).join(''):'<div class="muted">No dated bookings yet.</div>'}
+   </div>
+  </div>
+  ${vStayCard(V)}
+  <div class="card sec"><div class="row between"><h3>Planned vs spent by category</h3><span class="muted small">bar = planned · dark line = spent</span></div>
+   <div class="bars">${CATS.filter(c=>byCat[c.k].plan||byCat[c.k].act).map(c=>`<div class="b"><span><span class="dot" style="background:${c.c}"></span>${c.k}</span><div class="bar"><i style="width:${byCat[c.k].plan/max*100}%;background:${c.c}55"></i><i class="act" style="width:${byCat[c.k].act/max*100}%"></i></div><span class="num">${money(byCat[c.k].plan)}${byCat[c.k].act?`<br><span class="muted small">${money(byCat[c.k].act)} spent</span>`:''}</span></div>`).join('')||'<div class="muted">Add costs to see the breakdown.</div>'}</div>
+  </div>
+  <div class="card sec"><div class="row between"><h3>Driving by day</h3><span class="muted small">${miKm(totalMiles())} · ${Math.round(totalHours())} hrs behind the wheel</span></div>
+   <div class="chart">${days.map(d=>`<div class="c ${num(d.hours)>num(st.longDrive)?'long':''} ${!num(d.miles)?'zero':''}" style="height:${Math.max(2,num(d.miles)/maxMi*100)}%" title="${esc(fd(d.date))}: ${esc(d.from||'')} → ${esc(d.to||'')} ${num(d.miles)} mi ${hrs(d.hours)}"></div>`).join('')}</div>
+   <div class="chart-x">${days.map((d,i)=>`<span>${i%3===0?(D(d.date)?D(d.date).getUTCDate():''):''}</span>`).join('')}</div>
+   <div class="legend"><span><span class="dot" style="background:var(--accent)"></span>over ${num(st.longDrive)} hrs</span><span><span class="dot" style="background:#fdba74"></span>drive day</span><span>Hover a bar for details</span></div>
+  </div>`;
+}
+
+/* Itinerary */
+function vItinerary(){
+  const st=ST();const days=sortDays();const rows=[];const seen=new Set(days.map(d=>d.date));
+  const all=[];if(D(st.start)&&D(st.end)){for(let x=st.start;x<=st.end;x=addD(x,1)){if(!seen.has(x))all.push({missing:true,date:x})}}
+  const list=[...days,...all].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const NI=Object.fromEntries(nightsInfo().map(x=>[x.day.id,x]));const V=VP();
+  list.forEach(d=>{
+    const dn=D(st.start)&&d.date?diffD(st.start,d.date)+1:'';
+    if(d.missing){rows.push(`<tr class="day-missing"><td>${dn}</td><td class="nowrap">${fd(d.date)}</td><td colspan="5">Nothing planned <button class="btn sm" data-act="new-day" data-date="${d.date}">+ Plan this day</button></td></tr>`);return}
+    const ni=NI[d.id];let hc='';
+    if(!ni)hc='<span class="muted">—</span>';else if(d.noHotel)hc='<span class="muted">Not needed</span>';
+    else{const hs=V?ni.hotels.filter(h=>splitOf(h).some(id=>partyOf(id)===V)):ni.hotels;const miss=V?ni.missing.filter(p=>p===V):ni.missing;
+      hc=hs.map(h=>`<div><span class="ok">✓</span> ${esc(h.title)} <span class="pill p-${esc(h.status)}">${esc(h.status)}</span>${stayTags(h)}</div>`).join('')+(miss.length?`<button class="btn sm" data-act="hotel-for" data-id="${d.id}" data-p="${miss[0]}" style="color:var(--warn);margin-top:3px">⚠ No room: ${miss.map(p=>esc(pname(p))).join(', ')}</button>`:'')}
+    const route=d.from&&d.to&&d.from!==d.to?`${esc(d.from)} → ${esc(d.to)} <a href="${mapUrl(d.from,d.to)}" target="_blank" rel="noopener" title="Open route in Google Maps" data-stop="1">↗</a>`:esc(d.to||d.from||'');
+    rows.push(`<tr class="click ${num(d.hours)>num(st.longDrive)?'day-long':''}" data-act="edit-day" data-id="${d.id}"><td>${dn}</td><td class="nowrap">${fd(d.date)}</td><td>${route}</td><td class="num">${num(d.miles)?miKm(d.miles):''}<br><span class="muted small">${hrs(d.hours)}</span></td><td>${d.night?esc(d.night):ni?`<span class="muted" title="From your accommodation booking">${esc(ni.night)}</span>`:''}</td><td>${hc}</td><td class="small">${esc(d.plan)}${d.notes?`<div class="muted">${esc(d.notes)}</div>`:''}${dayBookings(d.date,V)}<div class="row" style="gap:4px;margin-top:5px"><button class="btn sm" data-act="day-add" data-type="Food" data-date="${d.date}" data-loc="${esc(d.night||d.to||'')}">+ 🍽️ Food</button><button class="btn sm" data-act="day-add" data-type="Activity" data-date="${d.date}" data-loc="${esc(d.night||d.to||'')}">+ 🎟️ Activity</button></div></td></tr>`);
+  });
+  const nights=nightsInfo();
+  return `<div class="row between"><h2>Itinerary</h2><div class="row"><span class="muted small">${nights.filter(n=>!n.need).length}/${nights.length} nights fully booked · ${miKm(totalMiles())}</span><button class="btn pri" data-act="new-day">+ Add day</button></div></div>
+  <p class="muted small">Click a day to edit. Miles and hours feed the fuel forecast; overnight towns are checked against your hotel bookings. Days over ${num(st.longDrive)} hrs driving are marked in orange.</p>
+  <div class="tbl-wrap"><table><thead><tr><th>Day</th><th>Date</th><th>Route</th><th class="num">Drive</th><th>Overnight</th><th>Hotel</th><th>Plan</th></tr></thead><tbody>${rows.join('')||'<tr><td colspan="7" class="empty">Set trip dates in Trip setup, then add days.</td></tr>'}</tbody>
+  <tfoot><tr><td colspan="3">Total</td><td class="num">${miKm(totalMiles())}<br><span class="small">${hrs(totalHours())}</span></td><td colspan="3"></td></tr></tfoot></table></div>`;
+}
+
+function stayTags(b){if(b.type!=='Hotel')return '';const k={hotel:'🏨 Hotel',airbnb:'🏠 Airbnb',camping:'⛺ Camping',other:'🏡 Other'}[b.stayKind]||'';
+  const bf=b.breakfast==='incl'?'🍳 Breakfast incl.':b.breakfast==='fee'?`🍳 Breakfast ${num(b.bfFee)?orig(b.bfFee,b.cur)+' pp':'extra'}${b.bfAdd?' (costed)':''}`:'';
+  return [k,bf].filter(Boolean).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}
+const STAY_ROWS=[['hotel','🏨 Hotel / motel'],['airbnb','🏠 Airbnb'],['camping','⛺ Camping'],['other','🏡 Other'],['none','🚫 No bed needed'],['unbooked','⚠️ Not booked yet'],['unplanned','📅 Not planned yet']];
+function stayTally(){const st=ST();const ni=nightsInfo();const total=D(st.start)&&D(st.end)?diffD(st.start,st.end):ni.length;const per={};
+  P().forEach(p=>{const t=Object.fromEntries(STAY_ROWS.map(r=>[r[0],0]));ni.forEach(x=>{let c;if(x.day.noHotel)c='none';else{const h=x.hotels.find(h=>splitOf(h).some(id=>partyOf(id)===p.id));c=h?(h.stayKind||'hotel'):'unbooked'}t[c]++});t.unplanned=Math.max(0,total-ni.length);per[p.id]=t});
+  return {per,total}}
+function vStayCard(V){const {per,total}=stayTally();const cols=V?[V]:P().map(p=>p.id);
+  const rows=STAY_ROWS.filter(([k])=>k==='hotel'||k==='camping'||cols.some(c=>per[c]&&per[c][k]));
+  return `<div class="card sec"><div class="row between"><h3>Nights by accommodation</h3><span class="muted small">${total} nights in the trip</span></div>
+  <div class="tbl-wrap"><table><thead><tr><th></th>${cols.map(c=>`<th class="num">${V?'Nights':esc(pname(c))}</th>`).join('')}</tr></thead><tbody>
+  ${rows.map(([k,l])=>`<tr><td>${l}</td>${cols.map(c=>`<td class="num ${k==='unbooked'&&per[c][k]?'warn':''}">${per[c][k]||'<span class="muted">0</span>'}</td>`).join('')}</tr>`).join('')}
+  </tbody></table></div><div class="muted small" style="margin-top:6px">From your accommodation bookings and their type. Untyped hotel bookings count as Hotel / motel. “Not planned yet” means days with no overnight town set.</div></div>`}
+function dayBookings(date,V){
+  const L=S.bookings.filter(b=>b.status!=='Cancelled'&&['Activity','Food','Wedding','Other'].includes(b.type)&&b.start&&b.start<=date&&date<=(b.end||b.start)&&(!V||splitOf(b).some(id=>partyOf(id)===V)))
+    .sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+  return L.length?`<div style="margin-top:5px">${L.map(b=>`<div class="daybk" data-act="edit-booking" data-id="${b.id}">${BICON[b.type]||''} <b>${esc(b.title)}</b>${b.time?` · ${esc(b.time)}`:''} <span class="pill p-${esc(b.status)}">${esc(b.status)}</span>${num(b.cost)?` <span class="muted">${money(bookShare(b))}</span>`:''}</div>`).join('')}</div>`:'';
+}
+/* Bookings */
+function vBookings(){
+  let list=[...S.bookings].sort((a,b)=>(a.start||'9').localeCompare(b.start||'9'));
+  if(F.bType)list=list.filter(b=>b.type===F.bType);if(F.bStatus)list=list.filter(b=>b.status===F.bStatus);
+  const V=VP();if(V)list=list.filter(b=>splitOf(b).some(id=>partyOf(id)===V));
+  const td=todayISO();let tc=0,tp=0;
+  const rows=list.map(b=>{const c=bookShare(b),full=conv(b.cost,b.cur),p=bookingPaid(b);if(b.status!=='Cancelled'){tc+=c;tp+=p}
+    const k=b.cancelBy?diffD(td,b.cancelBy):null;const nights=b.type==='Hotel'&&b.start&&b.end?diffD(b.start,b.end):0;const url=safeUrl(b.link);
+    return `<tr class="click" data-act="edit-booking" data-id="${b.id}"><td><span class="pill p-${esc(b.status)}">${esc(b.status)}</span></td><td class="nowrap">${b.type==='Hotel'&&b.stayKind==='airbnb'?'🏠 Airbnb':b.type==='Hotel'&&b.stayKind==='camping'?'⛺ Camping':b.type==='Hotel'&&b.stayKind==='other'?'🏡 Stay':(BICON[b.type]||'')+' '+esc(b.type)}</td><td><b>${esc(b.title)}</b>${stayTags(b)}<div class="muted small">For: ${esc(splitLabel(b))}${b.provider?' · '+esc(b.provider):''}</div></td>
+    <td class="nowrap small">${fd(b.start)}${b.end&&b.end!==b.start?' → '+fd(b.end):''}${nights?`<div class="muted">${nights} night${nights>1?'s':''}</div>`:''}${b.time?`<div class="muted">${esc(b.time)}</div>`:''}</td><td class="small">${esc(b.location)}</td><td class="small">${esc(b.conf)}</td>
+    <td class="num">${money(c)}${V&&Math.abs(full-c)>0.5?`<div class="muted small">share of ${money(full)}</div>`:b.cur!==dispCur&&num(b.cost)?`<div class="muted small">${orig(b.cost,b.cur)}</div>`:''}</td><td class="num">${p?money(p):'<span class="muted">—</span>'}</td>
+    <td class="small nowrap">${b.cancelBy?`${fd(b.cancelBy)}${k!==null&&k>=0&&k<=45?` <span class="warn">${k}d</span>`:k<0?' <span class="muted">passed</span>':''}`:''}</td>
+    <td class="nowrap"><button class="btn sm" data-act="pay-booking" data-id="${b.id}" title="Log a payment for this booking as an expense">💳 Log payment</button>${url?` <a class="btn sm" href="${esc(url)}" target="_blank" rel="noopener" data-stop="1">↗</a>`:''}</td></tr>`}).join('');
+  return `<div class="row between"><h2>Bookings & hotels</h2><button class="btn pri" data-act="new-booking">+ Add booking</button></div>
+  <p class="muted small">Flights, hotels, car hire, tours and wedding bits. Costs flow into the forecast; “Log payment” records what's actually been paid (and who paid it) under Expenses.</p>
+  <div class="row" style="margin:10px 0"><div class="chips">${['',...BTYPES].map(x=>`<span class="chip ${F.bType===x?'on':''}" data-act="f-btype" data-v="${x}">${x?BICON[x]+' '+x:'All types'}</span>`).join('')}</div>
+  <div class="chips">${['',...STATUSES].map(x=>`<span class="chip ${F.bStatus===x?'on':''}" data-act="f-bstatus" data-v="${x}">${x||'Any status'}</span>`).join('')}</div></div>
+  <div class="tbl-wrap"><table><thead><tr><th>Status</th><th>Type</th><th>What</th><th>When</th><th>Where</th><th>Conf #</th><th class="num">Cost</th><th class="num">Paid</th><th>Free cancel until</th><th></th></tr></thead>
+  <tbody>${rows||'<tr><td colspan="10" class="empty">No bookings match.</td></tr>'}</tbody><tfoot><tr><td colspan="6">${V?'Total for '+esc(pname(V))+' (their share, excl. cancelled)':'Total (excl. cancelled)'}</td><td class="num">${money(tc)}</td><td class="num">${money(tp)}</td><td colspan="2"></td></tr></tfoot></table></div>`;
+}
+
+/* Forecast */
+function vForecast(){
+  const all=forecast();const V=VP();const items=scope(all);const t=totals(items);const n=V?members(V).length:(T().length||1);const pp=shares(planItems(all));const pb=byParty(pp);
+  const each=i=>i.splitBy==='party'&&partiesIn(i.split).length>1?i.amt/partiesIn(i.split).length:i.amt/(i.split.length||1);
+  const row=i=>{const srcTag=i.src==='auto'?'<span class="tag auto">auto</span>':i.src==='booking'?`<span class="tag">booking · ${esc(i.status)}</span>`:'<span class="tag">estimate</span>';
+    const act=i.src==='auto'?`data-act="goto-setup"`:i.src==='booking'?`data-act="edit-booking" data-id="${i.id}"`:`data-act="edit-budget" data-id="${i.id}"`;
+    const tog=i.kind==='optional'?`<input type="checkbox" class="chk" data-act="toggle-opt" data-src="${i.src}" data-id="${i.id}" ${i.on?'checked':''} title="Include in plan">`:'';
+    const last=V?`<td class="num muted">${Math.abs(i.full-i.amt)>0.5?money(i.full):'<span class="small">same</span>'}</td>`:`<td class="num muted">${money(each(i))}${i.splitBy==='party'&&partiesIn(i.split).length>1?'<div class="small">/profile</div>':''}</td>`;
+    return `<tr class="click" ${act} style="${i.kind==='optional'&&!i.on?'opacity:.5':''}"><td data-stop="1">${tog}</td><td><span class="dot" style="background:${CATC[i.cat]||'#999'}"></span>${esc(i.cat)}</td><td>${esc(i.label)} ${srcTag}${i.calc?`<div class="muted small">${esc(i.calc)}</div>`:''}</td><td class="small">${esc(splitLabel(i))}</td><td class="num"><b>${money(i.amt)}</b></td>${last}</tr>`};
+  const sec=(kind,title,desc)=>{const L=items.filter(i=>i.kind===kind).sort((a,b)=>CATS.findIndex(c=>c.k===a.cat)-CATS.findIndex(c=>c.k===b.cat)||b.amt-a.amt);const sum=L.reduce((s,i)=>s+(kind==='fixed'||i.on?i.amt:0),0);
+    return `<div class="sec"><div class="row between"><div><h3>${title}</h3><div class="muted small">${desc}</div></div><button class="btn" data-act="new-budget" data-kind="${kind}">+ Add ${kind} estimate</button></div>
+    <div class="tbl-wrap"><table><thead><tr><th style="width:30px">${kind==='optional'?'In':''}</th><th>Category</th><th>Item</th><th>Split</th><th class="num">${V?esc(pname(V))+' pays':'Total'}</th><th class="num">${V?'Full cost':'Each'}</th></tr></thead><tbody>${L.map(row).join('')||'<tr><td colspan="6" class="empty">Nothing yet.</td></tr>'}</tbody>
+    <tfoot><tr><td colspan="4">${kind==='fixed'?'Fixed total':'Selected extras'}</td><td class="num">${money(sum)}</td><td class="num">${n>1?money(sum/n)+`<div class="small muted">${V?'each':'avg/person'}</div>`:''}</td></tr></tfoot></table></div></div>`};
+  const byCat={};planItems(items).forEach(i=>byCat[i.cat]=(byCat[i.cat]||0)+i.amt);
+  return `<div class="row between"><h2>Cost forecast${V?' — '+esc(pname(V)):''}</h2><span class="muted small">Showing ${dispCur} · 1 USD = ${fx().toFixed(3)} AUD (change in Trip setup)</span></div>
+  ${V?`<p class="muted small">${esc(pname(V))}’s own costings: their estimates and extras, plus their share of shared bookings. Nothing here changes anyone else’s numbers. Switch to “Viewing: everyone” for the whole group.</p>`:''}
+  <div class="grid g4 sec" style="margin-top:12px">
+   <div class="card tile accent"><div class="lbl">Planned total</div><div class="val">${money(t.planned)}</div><div class="note">${n>1?money(t.planned/n)+(V?' each':' per person avg'):'fixed + chosen extras'}</div></div>
+   <div class="card tile"><div class="lbl">Fixed</div><div class="val">${money(t.fixed)}</div><div class="note">Things you'll pay regardless</div></div>
+   <div class="card tile"><div class="lbl">Optional selected</div><div class="val">${money(t.optOn)}</div><div class="note">${money(t.optAll-t.optOn)} more if you add every extra</div></div>
+   ${V?`<div class="card tile"><div class="lbl">Per person</div><div class="val" style="font-size:1.05rem;line-height:1.6">${members(V).map(id=>`${esc(tname(id))}: <b>${money(pp[id]||0)}</b>`).join('<br>')}</div></div>`
+   :`<div class="card tile"><div class="lbl">By profile</div><div class="val" style="font-size:1.05rem;line-height:1.6">${P().map(p=>`${esc(pname(p.id))}: <b>${money(pb[p.id]||0)}</b>`).join('<br>')}</div></div>`}
+  </div>
+  ${sec('fixed','Fixed costs','Shared bookings (at each person’s share), each profile’s own estimates, plus auto lines for fuel and nights not booked yet.')}
+  ${sec('optional','Optional extras','Each profile has its own extras. Ticking one on or off only changes that profile’s costs.')}
+  <div class="card sec"><h3>Planned by category</h3><div class="bars">${CATS.filter(c=>byCat[c.k]).map(c=>`<div class="b"><span><span class="dot" style="background:${c.c}"></span>${c.k}</span><div class="bar"><i style="width:${byCat[c.k]/Math.max(...Object.values(byCat))*100}%;background:${c.c}"></i></div><span class="num">${money(byCat[c.k])} <span class="muted small">${t.planned?Math.round(byCat[c.k]/t.planned*100):0}%</span></span></div>`).join('')}</div></div>`;
+}
+
+/* Expenses */
+function vExpenses(){
+  let list=[...S.expenses].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(F.eCat)list=list.filter(e=>e.cat===F.eCat);if(F.eWho)list=list.filter(e=>e.paidBy===F.eWho);
+  const V=VP();if(V)list=list.filter(e=>partyOf(e.paidBy)===V||splitOf(e).some(id=>partyOf(id)===V));
+  const tot=list.reduce((s,e)=>s+expShare(e),0);const st=ST();
+  const daily={};S.expenses.forEach(e=>{const a=expShare(e);if(a&&e.date&&e.date>=st.start&&e.date<=st.end)daily[e.date]=(daily[e.date]||0)+a});
+  const dates=[];if(D(st.start)&&D(st.end))for(let x=st.start;x<=st.end;x=addD(x,1))dates.push(x);
+  const dmax=Math.max(1,...Object.values(daily));const tripSpent=Object.values(daily).reduce((a,b)=>a+b,0);const daysIn=Object.keys(daily).length;
+  const b=paidByPerson();
+  return `<div class="row between"><h2>Expenses</h2><div class="row"><button class="btn" data-act="copy-csv">Copy as CSV</button><button class="btn pri" data-act="new-exp">+ Add expense</button></div></div>
+  <div class="grid g4 sec" style="margin-top:12px">
+   <div class="card tile accent"><div class="lbl">${V?'Spent — '+esc(pname(V))+'’s share':'Total spent'}</div><div class="val">${money(V?tot:spentTotal())}</div><div class="note">${V?'Their fair share of everything logged':S.expenses.length+' expense'+(S.expenses.length===1?'':'s')+' logged, incl. prepaid bookings'}</div></div>
+   <div class="card tile"><div class="lbl">On the trip</div><div class="val">${money(tripSpent)}</div><div class="note">${daysIn?money(tripSpent/daysIn)+' avg per day with spending':'Nothing logged during trip dates yet'}</div></div>
+   <div class="card tile"><div class="lbl">Paid by</div><div class="val" style="font-size:1.05rem;line-height:1.6">${(V?members(V).map(id=>T().find(t=>t.id===id)):T()).map(p=>`${esc(p.name)}: <b>${money(b[p.id]||0)}</b>`).join('<br>')}</div></div>
+  </div>
+  <div class="card sec"><h3>Daily spend during the trip</h3>
+   <div class="chart">${dates.map(d=>`<div class="c ${daily[d]?'':'zero'}" style="height:${Math.max(2,(daily[d]||0)/dmax*100)}%;${daily[d]?'background:var(--teal)':''}" title="${fd(d)}: ${money(daily[d]||0)}"></div>`).join('')}</div>
+   <div class="chart-x">${dates.map((d,i)=>`<span>${i%3===0?D(d).getUTCDate():''}</span>`).join('')}</div></div>
+  <div class="row sec" style="margin-bottom:10px">
+   <select class="btn" data-act="f-ecat"><option value="">All categories</option>${CATS.map(c=>`<option ${F.eCat===c.k?'selected':''}>${c.k}</option>`).join('')}</select>
+   <select class="btn" data-act="f-ewho"><option value="">Paid by anyone</option>${T().map(p=>`<option value="${p.id}" ${F.eWho===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</select>
+   <span class="muted small">${list.length} shown · ${money(tot)}${V?' (their share)':''}</span></div>
+  <div class="tbl-wrap"><table><thead><tr><th>Date</th><th>What</th><th>Category</th><th>Paid by</th><th>Split</th><th class="num">Amount</th></tr></thead><tbody>
+  ${list.map(e=>`<tr class="click" data-act="edit-exp" data-id="${e.id}"><td class="nowrap">${fd(e.date)}</td><td>${esc(e.desc)}${e.bookingId?'<span class="tag">booking</span>':''}${e.notes?`<div class="muted small">${esc(e.notes)}</div>`:''}</td><td class="nowrap"><span class="dot" style="background:${CATC[e.cat]||'#999'}"></span>${esc(e.cat)}</td><td>${esc(tname(e.paidBy))}</td><td class="small">${esc(splitLabel(e))}</td><td class="num">${money(expShare(e),2)}${V&&Math.abs(expShare(e)-expAmt(e))>0.005?`<div class="muted small">share of ${money(expAmt(e),2)}</div>`:e.cur!==dispCur?`<div class="muted small">${orig(e.amount,e.cur)}</div>`:''}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">No expenses yet — use “+ Expense” to log one in a few taps.</td></tr>'}
+  </tbody></table></div>`;
+}
+
+/* Settle */
+function vSettle(){
+  const items=forecast();const plan=planItems(items);const pp=shares(plan);const pb=byParty(pp);const b=balances();const tx=settleUp();const PS=P();
+  const catRows=CATS.map(c=>{const s=byParty(shares(plan.filter(i=>i.cat===c.k)));const tot=Object.values(s).reduce((a,v)=>a+v,0);return tot?`<tr><td><span class="dot" style="background:${c.c}"></span>${c.k}</td>${PS.map(p=>`<td class="num">${money(s[p.id]||0)}</td>`).join('')}<td class="num"><b>${money(tot)}</b></td></tr>`:''}).join('');
+  return `<h2>Per profile & settle up</h2>
+  <div class="sec"><h3>Planned cost by profile and category</h3><p class="muted small">From the forecast (fixed + selected extras). Couples are shown together. Items split “per person” charge a couple twice what a single pays; items split “per profile” (e.g. a hotel room or a gift) charge each profile once.</p>
+  <div class="tbl-wrap"><table><thead><tr><th>Category</th>${PS.map(p=>`<th class="num">${esc(pname(p.id))}</th>`).join('')}<th class="num">Total</th></tr></thead><tbody>${catRows||'<tr><td class="empty" colspan="9">No costs yet.</td></tr>'}</tbody>
+  <tfoot><tr><td>Total</td>${PS.map(p=>`<td class="num">${money(pb[p.id]||0)}</td>`).join('')}<td class="num">${money(Object.values(pb).reduce((a,v)=>a+v,0))}</td></tr>
+  <tr><td class="small">Per person</td>${PS.map(p=>`<td class="num small">${members(p.id).map(id=>`${esc(tname(id))} ${money(pp[id]||0)}`).join('<br>')}</td>`).join('')}<td></td></tr></tfoot></table></div></div>
+  <div class="grid g2 sec">
+   <div class="card"><h3>Actual spending</h3><p class="muted small">From logged expenses. A couple's spending is pooled, so it doesn't matter which of them paid.</p>
+    <div class="tbl-wrap"><table><thead><tr><th>Profile</th><th class="num">Paid</th><th class="num">Fair share</th><th class="num">Balance</th></tr></thead><tbody>
+    ${PS.map(p=>{const v=b[p.id]||{paid:0,share:0};const n=v.paid-v.share;return `<tr><td>${esc(pname(p.id))}</td><td class="num">${money(v.paid,2)}</td><td class="num">${money(v.share,2)}</td><td class="num ${n>0.5?'ok':n<-0.5?'bad':''}">${n>0.5?'is owed ':n<-0.5?'owes ':''}${money(Math.abs(n),2)}</td></tr>`}).join('')}
+    </tbody></table></div></div>
+   <div class="card"><h3>To square up</h3>
+    ${tx.length?tx.map(x=>`<div class="person"><span><b>${esc(pname(x.from))}</b> pays <b>${esc(pname(x.to))}</b></span><b>${money(x.amt,2)}</b></div>`).join(''):'<div class="muted">Everyone is square. 🎉</div>'}
+    <div class="muted small" style="margin-top:10px">Fewest transfers between profiles to even out what everyone has paid. Amounts in ${dispCur}.</div></div>
+  </div>`;
+}
+
+/* Checklist */
+function vChecklist(){
+  const td=todayISO();const L=[...S.tasks].sort((a,b)=>(a.done?1:0)-(b.done?1:0)||(a.due||'9').localeCompare(b.due||'9'));const done=S.tasks.filter(x=>x.done).length;
+  return `<div class="row between"><h2>Pre-trip checklist</h2><div class="row"><span class="muted small">${done}/${S.tasks.length} done</span><button class="btn pri" data-act="new-task">+ Add task</button></div></div>
+  <div class="tbl-wrap sec"><table><thead><tr><th style="width:34px"></th><th>Task</th><th>Due</th><th>Who</th></tr></thead><tbody>
+  ${L.map(x=>{const k=x.due?diffD(td,x.due):null;return `<tr class="click ${x.done?'task-done':''}" data-act="edit-task" data-id="${x.id}"><td data-stop="1"><input type="checkbox" class="chk" data-act="toggle-task" data-id="${x.id}" ${x.done?'checked':''}></td><td>${esc(x.text)}${x.notes?`<div class="muted small">${esc(x.notes)}</div>`:''}</td><td class="nowrap small">${x.due?fdy(x.due):''}${!x.done&&k!==null?(k<0?' <span class="bad">overdue</span>':k<=30?` <span class="warn">${k}d</span>`:''):''}</td><td class="small">${x.owner?esc(tname(x.owner)):''}</td></tr>`}).join('')||'<tr><td colspan="4" class="empty">No tasks yet.</td></tr>'}
+  </tbody></table></div>`;
+}
+
+/* Setup */
+function vSetup(){
+  const st=ST();const f=(k,l,type='text',hint='',step='')=>`<div class="field"><label>${l}</label>${type==='date'?dateField('set_'+k,st[k],`data-set="${k}"`):`<input type="${type}" ${step?`step="${step}"`:''} data-set="${k}" value="${esc(st[k])}">`}${hint?`<div class="hint">${hint}</div>`:''}</div>`;
+  return `<h2>Trip setup</h2><p class="muted small">Changes save as soon as you leave a field.</p>
+  <div class="grid g2 sec setup">
+   <div class="card"><h3>Trip</h3>${f('name','Trip name')}<div class="form">${f('start','Start date','date')}${f('end','End date (fly home)','date')}</div>
+    <h3 style="margin-top:12px">Profiles</h3><p class="muted small">A profile is a couple travelling together or one person on their own. A couple's spending is pooled when settling up, and “per profile” costs (a hotel room, a gift) are charged once per profile. Removing someone takes them out of every split.</p>
+    ${P().map(p=>`<div class="profile"><div class="field"><label>Profile name <span style="text-transform:none;font-weight:400">(optional)</span></label><input data-pname="${esc(p.id)}" value="${esc(p.name)}" placeholder="${esc(members(p.id).map(tname).join(' & '))}"></div>
+      ${members(p.id).map(id=>`<div class="trav"><input data-trav="${id}" value="${esc(tname(id))}" aria-label="Name"><button class="btn danger" data-act="del-trav" data-id="${id}" ${T().length<2?'disabled':''}>Remove</button></div>`).join('')}
+      <div class="field" style="margin-top:8px"><label>Hotel estimate for this profile (US$/night)</label><input type="number" step="1" data-pest="${esc(p.id)}" value="${esc(((ST().parties||[]).find(x=>x.id===p.id)||{}).nightEst||'')}" placeholder="${esc(ST().nightEst)} (trip default)"><div class="hint">Used for nights this profile hasn’t booked yet. Leave blank to use the trip default.</div></div>
+      <button class="btn sm" data-act="add-member" data-p="${esc(p.id)}">+ Add partner to this profile</button></div>`).join('')}
+    <button class="btn" data-act="add-profile">+ Add profile</button></div>
+   <div class="card"><h3>Money & driving assumptions</h3>
+    ${f('audPerUsd','AUD per 1 USD','number','Used to convert between currencies. Wise mid-market was about 1.43–1.45 in Nov 2026; card rates are a bit worse.','0.001')}
+    <div class="form">${f('fuelPrice','Fuel price (US$/gallon)','number','US average was ~$4.10 in Nov 2026; California runs well above that.','0.01')}${f('mpg','Car economy (mpg)','number','Mid-size SUV ≈ 25 mpg. (25 mpg ≈ 9.4 L/100km)','0.1')}
+    ${f('localPct','Extra local driving %','number','Added on top of itinerary miles for side trips, detours and looking for dinner.','1')}${f('nightEst','Default hotel estimate (US$/night)','number','For nights not booked yet. Each profile can override this under Profiles.','1')}
+    ${f('longDrive','Flag drives longer than (hrs)','number','','0.5')}
+    <div class="field"><label>Split fuel</label><select data-set="fuelSplitBy">${SPLITBY_OPT.map(([v,l])=>`<option value="${v}" ${(st.fuelSplitBy||'person')===v?'selected':''}>${l}</option>`).join('')}</select></div></div></div>
+  </div>
+  <div class="card sec"><h3>Invite your group</h3><p class="muted small">Anyone with this link can open and edit this trip, so only send it to people on the trip.</p>
+   <div class="row" style="flex-wrap:nowrap"><input readonly value="${esc(TripCloud.inviteLink())}" style="flex:1;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--soft)" onclick="this.select()"><button class="btn pri" data-act="copy-invite">Copy link</button></div>
+   <h3 style="margin-top:16px">Put it on your phone</h3><p class="muted small"><b>iPhone:</b> open the link in Safari → Share → <b>Add to Home Screen</b>. <b>Android:</b> Chrome ⋮ menu → <b>Add to Home screen</b> / <b>Install app</b>. Open it once while online, then it works offline.</p></div>
+  <div class="card sec"><h3>Backup</h3><p class="muted small">Copy everything as JSON to keep a backup, or paste a backup to restore it (for example, from the Claude version of the planner).</p>
+   <div class="row"><button class="btn" data-act="export">Export backup</button><button class="btn" data-act="import">Import backup</button><button class="btn" data-act="trip-leave" style="margin-left:auto">Switch to another trip</button></div></div>`;
+}
+
+/* ---------- forms ---------- */
+let modalState=null;
+function fieldHtml(fd_,v){
+  const id='f_'+fd_.k;const full=fd_.full?'full':'';
+  if(fd_.type==='checkbox')return `<div class="field ${full}"><label class="cbline"><input type="checkbox" class="chk" id="${id}" ${v?'checked':''}> ${fd_.label}</label>${fd_.hint?`<div class="hint">${fd_.hint}</div>`:''}</div>`;
+  if(fd_.type==='split'){const s=(v&&v.length)?v:T().map(t=>t.id);
+    return `<div class="field full"><label>${fd_.label||'Split between'}</label><div class="qchips"><span class="chip" data-q="" data-for="${id}">Everyone</span>${P().map(p=>`<span class="chip" data-q="${esc(p.id)}" data-for="${id}">${esc(pname(p.id))} only</span>`).join('')}</div>
+    <div class="splitbox">${P().map(p=>`<span style="display:inline-flex;gap:10px;padding:4px 10px;border:1px dashed var(--line);border-radius:8px">${members(p.id).map(tid=>`<label class="cbline"><input type="checkbox" class="chk" name="${id}" value="${tid}" ${s.includes(tid)?'checked':''}> ${esc(tname(tid))}</label>`).join('')}</span>`).join('')}</div></div>`}
+  let inp;
+  if(fd_.type==='select'){const opts=typeof fd_.opts==='function'?fd_.opts():fd_.opts;inp=`<select id="${id}">${opts.map(o=>{const[val,lab]=Array.isArray(o)?o:[o,o];return `<option value="${esc(val)}" ${String(v??'')===String(val)?'selected':''}>${esc(lab)}</option>`}).join('')}</select>`}
+  else if(fd_.type==='date')inp=dateField(id,v);
+  else if(fd_.type==='textarea')inp=`<textarea id="${id}" placeholder="${esc(fd_.ph||'')}">${esc(v)}</textarea>`;
+  else inp=`<input id="${id}" type="${fd_.type||'text'}" ${fd_.step?`step="${fd_.step}"`:''} ${fd_.type==='number'?'inputmode="decimal"':''} placeholder="${esc(fd_.ph||'')}" value="${esc(v)}">`;
+  return `<div class="field ${full}"><label for="${id}">${fd_.label}</label>${inp}${fd_.hint?`<div class="hint">${fd_.hint}</div>`:''}</div>`;
+}
+function openForm({title,fields,data,onSave,onDelete,extraBtn}){
+  modalState={fields,data,onSave,onDelete};
+  const m=$('#modal');m.hidden=false;
+  m.innerHTML=`<div class="dialog" role="dialog" aria-modal="true"><h2>${esc(title)}</h2><form id="mform" class="form">${fields.map(f=>f.show?`<div data-show='${esc(JSON.stringify(f.show))}' style="display:contents">${fieldHtml(f,data[f.k])}</div>`:fieldHtml(f,data[f.k])).join('')}</form>
+  <div class="foot">${onDelete?'<button class="btn danger left" data-m="del">Delete</button>':''}${extraBtn?`<button class="btn" data-m="extra">${extraBtn.label}</button>`:''}<button class="btn" data-m="cancel">Cancel</button><button class="btn pri" data-m="save">Save</button></div></div>`;
+  modalState.extra=extraBtn&&extraBtn.fn;
+  const sync=()=>m.querySelectorAll('[data-show]').forEach(w=>{const c=JSON.parse(w.dataset.show);w.style.display=Object.entries(c).every(([k,v])=>{const el=document.getElementById('f_'+k);return el&&el.value===v})?'contents':'none'});
+  sync();m.querySelector('#mform').addEventListener('change',sync);
+  const first=m.querySelector("input:not([type=checkbox]):not([type=hidden]),select,textarea");if(first&&window.innerWidth>640)first.focus();
+}
+function readForm(){
+  const out={...modalState.data};
+  modalState.fields.forEach(f=>{const id='f_'+f.k;
+    if(f.type==='checkbox')out[f.k]=$('#'+id).checked;
+    else if(f.type==='split'){const ch=[...document.querySelectorAll(`input[name="${id}"]:checked`)].map(x=>x.value);out[f.k]=ch.length===T().length?[]:ch}
+    else if(f.type==='number'){const v=$('#'+id).value;out[f.k]=v===''?'':num(v)}
+    else out[f.k]=$('#'+id).value.trim()});
+  return out;
+}
+function closeModal(){$('#modal').hidden=true;$('#modal').innerHTML='';modalState=null;if(pending){pending=false;render(true)}}
+$('#modal').addEventListener('click',e=>{
+  if(e.target.id==='modal'){closeModal();return}
+  const q=e.target.closest('[data-q]');if(q){const want=q.dataset.q?members(q.dataset.q):T().map(t=>t.id);document.querySelectorAll(`input[name="${q.dataset.for}"]`).forEach(c=>c.checked=want.includes(c.value));return}
+  const b=e.target.closest('[data-m]');if(!b)return;const a=b.dataset.m;
+  if(a==='cancel')closeModal();
+  else if(a==='save'){const d=readForm();const r=modalState.onSave(d);if(r!==false)closeModal()}
+  else if(a==='del'){if(b.dataset.sure){modalState.onDelete();closeModal()}else{b.dataset.sure=1;b.textContent='Click again to delete'}}
+  else if(a==='extra'){const d=readForm();modalState.extra(d)}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modalState)closeModal()});
+document.addEventListener('submit',e=>{e.preventDefault();if(e.target.id==='mform'){const b=$('#modal [data-m="save"]');if(b)b.click()}});
+
+const curOpt=['USD','AUD'];
+const catOpt=()=>CATS.map(c=>c.k);
+const travOpt=()=>T().map(t=>[t.id,t.name]);
+const DAY_F=[{k:'date',label:'Date',type:'date'},{k:'night',label:'Overnight in',ph:'e.g. Moab, UT'},{k:'from',label:'Drive from',ph:'e.g. Las Vegas, NV'},{k:'to',label:'Drive to',ph:'e.g. Springdale, UT'},
+ {k:'miles',label:'Miles',type:'number',hint:'km ÷ 1.609'},{k:'hours',label:'Drive hours',type:'number',step:'0.25'},{k:'noHotel',label:'No hotel needed tonight (overnight flight, staying with friends…)',type:'checkbox',full:true},
+ {k:'plan',label:'Plan',type:'textarea',full:true},{k:'notes',label:'Notes',type:'textarea',full:true}];
+const BOOK_F=[{k:'type',label:'Type',type:'select',opts:BTYPES},{k:'status',label:'Status',type:'select',opts:STATUSES},{k:'title',label:'What',full:true,ph:'e.g. Holiday Inn Express Salida'},
+ {k:'start',label:'Start / check-in',type:'date'},{k:'end',label:'End / check-out',type:'date'},{k:'time',label:'Time(s)',ph:'e.g. 10:40pm dep / 6:15pm arr'},{k:'location',label:'Location / address'},
+ {k:'provider',label:'Booked with',ph:'e.g. Booking.com, Qantas'},{k:'conf',label:'Confirmation #'},{k:'cost',label:'Total cost',type:'number',step:'0.01'},{k:'cur',label:'Currency',type:'select',opts:curOpt},
+ {k:'stayKind',label:'Accommodation type',type:'select',opts:[['hotel','🏨 Hotel / motel'],['airbnb','🏠 Airbnb / holiday rental'],['camping','⛺ Camping'],['other','🏡 Other (friends, family…)']],show:{type:'Hotel'}},
+ {k:'breakfast',label:'Breakfast',type:'select',opts:[['','Not included'],['incl','Included in the price'],['fee','Available for a fee']],show:{type:'Hotel'}},
+ {k:'bfFee',label:'Breakfast fee (per person, per night)',type:'number',step:'0.01',hint:'In the same currency as the booking.',show:{type:'Hotel',breakfast:'fee'}},
+ {k:'bfAdd',label:'Add breakfast to our costs',type:'checkbox',hint:'Counts the fee × nights × people in the split, under Food & Drink.',show:{type:'Hotel',breakfast:'fee'}},
+ {k:'cancelBy',label:'Free cancellation until',type:'date'},{k:'link',label:'Link',ph:'https://…'},
+ {k:'split',type:'split'},{k:'splitBy',label:'How to split',type:'select',opts:SPLITBY_OPT,full:true,hint:'For a hotel room shared by a couple, tick just them. For a car shared by everyone, “per person” means a couple pays two shares.'},{k:'notes',label:'Notes',type:'textarea',full:true}];
+const BUD_F=[{k:'owner',label:'Profile',type:'select',opts:()=>P().map(p=>[p.id,pname(p.id)]),hint:'Estimates belong to one profile and only affect their costs.'},{k:'item',label:'Item'},{k:'cat',label:'Category',type:'select',opts:catOpt},{k:'kind',label:'Fixed or optional',type:'select',opts:[['fixed','Fixed'],['optional','Optional']]},
+ {k:'amount',label:'Amount (each)',type:'number',step:'0.01'},{k:'cur',label:'Currency',type:'select',opts:curOpt},{k:'qty',label:'Quantity',type:'number',step:'0.5',hint:'e.g. 16 days, 4 ride days'},
+ {k:'per',label:'Multiply by',type:'select',opts:[['','Nothing — it’s a total'],['person','Number of people in this profile']]},{k:'notes',label:'Notes',type:'textarea',full:true}];
+const EXP_F=[{k:'desc',label:'What',full:true,ph:'e.g. Dinner in Moab'},{k:'amount',label:'Amount',type:'number',step:'0.01'},{k:'cur',label:'Currency',type:'select',opts:curOpt},
+ {k:'date',label:'Date',type:'date'},{k:'cat',label:'Category',type:'select',opts:catOpt},{k:'paidBy',label:'Paid by',type:'select',opts:travOpt},
+ {k:'bookingId',label:'Linked booking',type:'select',opts:()=>[['','— none —'],...S.bookings.map(b=>[b.id,b.title])]},{k:'splitBy',label:'How to split',type:'select',opts:SPLITBY_OPT},{k:'split',type:'split'},{k:'notes',label:'Notes',type:'textarea',full:true}];
+const TASK_F=[{k:'text',label:'Task',full:true},{k:'due',label:'Due',type:'date'},{k:'owner',label:'Who',type:'select',opts:()=>[['','—'],...travOpt()]},{k:'done',label:'Done',type:'checkbox',full:true},{k:'notes',label:'Notes',type:'textarea',full:true}];
+
+function editDay(d){openForm({title:d.id?'Edit day':'Add day',fields:DAY_F,data:d,onSave:x=>{if(!x.date){toast('Pick a date');return false}save('days',x)},onDelete:d.id?()=>remove('days',d.id):null})}
+function editBooking(b){openForm({title:b.id?'Edit booking':'Add booking',fields:BOOK_F,data:b,onSave:x=>{if(!x.title){toast('Give it a name');return false}if(x.optional&&x.on===undefined)x.on=true;save('bookings',x)},onDelete:b.id?()=>remove('bookings',b.id):null})}
+function editBudget(l){l={...l,per:perOf(l)==='person'?'person':''};delete l.perPerson;if(!l.owner)l.owner=VP()||(P()[0]||{}).id;
+  const fields=!l.id&&!VP()?[...BUD_F.slice(0,1),{k:'allProfiles',label:'Add a copy to every profile (each can then edit their own)',type:'checkbox',full:true},...BUD_F.slice(1)]:BUD_F;
+  openForm({title:l.id?'Edit estimate':'Add estimate',fields,data:l,onSave:x=>{if(!x.item){toast('Name the item');return false}if(x.on===undefined)x.on=true;delete x.split;delete x.splitBy;const all=x.allProfiles;delete x.allProfiles;
+    if(all&&!x.id){P().forEach(p=>save('budget',{...x,owner:p.id,id:uid()}))}else save('budget',x)},onDelete:l.id?()=>remove('budget',l.id):null})}
+function editExp(e){openForm({title:e.id?'Edit expense':'Add expense',fields:EXP_F,data:e,onSave:x=>{if(!x.amount){toast('Enter an amount');return false}lsSet('lastPayer',x.paidBy);lsSet('lastCur',x.cur);save('expenses',x)},onDelete:e.id?()=>remove('expenses',e.id):null})}
+function editTask(t){openForm({title:t.id?'Edit task':'Add task',fields:TASK_F,data:t,onSave:x=>{if(!x.text)return false;save('tasks',x)},onDelete:t.id?()=>remove('tasks',t.id):null})}
+function newExp(extra={}){const st=ST();const td=todayISO();editExp({date:td>=st.start&&td<=st.end?td:td,cur:lsGet('lastCur')||'USD',paidBy:lsGet('lastPayer')&&T().some(t=>t.id===lsGet('lastPayer'))?lsGet('lastPayer'):(T()[0]||{}).id,cat:'Food & Drink',split:[],...extra})}
+
+/* ---------- events ---------- */
+window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if(TABS.some(t=>t[0]===h)){tab=h;render(true);window.scrollTo(0,0)}});
+$('#fab').addEventListener('click',()=>newExp());
+document.addEventListener('click',e=>{
+  if(e.target.closest('a'))return;
+  if(e.target.closest('#modal'))return;
+  const el=e.target.closest('[data-act]');if(!el||el.tagName==='INPUT'||el.tagName==='SELECT')return;
+  const a=el.dataset.act,id=el.dataset.id;const find=(c)=>S[c].find(x=>x.id===id);
+  switch(a){
+    case 'cur':dispCur=el.dataset.v;lsSet('disp',dispCur);render(true);break;
+    case 'trip-new':el.disabled=true;el.textContent='Creating…';TripCloud.create().then(id=>{location.href=location.pathname+'?trip='+id}).catch(e=>{toast('Couldn’t create the trip. Check your connection.');el.disabled=false;el.textContent='Create a new trip'});break;
+    case 'trip-join':{const v=($('#joinlink')||{}).value||'';let id=null;try{id=new URL(v.trim()).searchParams.get('trip')}catch(e){id=v.trim()}if(!id||!/^[A-Za-z0-9]{12,40}$/.test(id)){toast('That doesn’t look like an invite link');break}location.href=location.pathname+'?trip='+id;break}
+    case 'copy-invite':copyText(TripCloud.inviteLink(),'Invite link copied');break;
+    case 'trip-leave':if(!el.dataset.sure){el.dataset.sure=1;el.textContent='Sure? (this trip stays saved)';return}TripCloud.leave();break;
+    case 'init-blank':save('settings',{...DEFAULT_SETTINGS});break;
+    case 'new-day':{const days=sortDays();const last=days[days.length-1];editDay({date:el.dataset.date||(last?addD(last.date,1):ST().start),from:last?last.night||last.to:'',night:''});break}
+    case 'edit-day':editDay({...find('days')});break;
+    case 'hotel-for':{const d0=find('days');const nn=(nightsInfo().find(x=>x.day.id===d0.id)||{}).night||d0.night;const d={...d0,night:nn};const pid=el.dataset.p;let end=addD(d.date,1);const days=sortDays();const i=days.findIndex(x=>x.id===d.id);for(let j=i+1;j<days.length&&days[j].night===d.night;j++)end=addD(days[j].date,1);
+      const multi=P().length>1&&pid;editBooking({type:'Hotel',status:'Idea',title:'Hotel — '+d.night+(multi?' ('+pname(pid)+')':''),location:d.night,start:d.date,end,cur:'USD',cost:Math.round(diffD(d.date,end)*nightEstFor(pid||(P()[0]||{}).id)),split:multi?members(pid):[]});break}
+    case 'day-add':{const V=VP();editBooking({type:el.dataset.type,status:'Idea',start:el.dataset.date,end:el.dataset.date,location:el.dataset.loc||'',cur:'USD',split:V?members(V):[],splitBy:'person'});break}
+    case 'new-booking':{const V=VP();editBooking({type:'Hotel',status:'Idea',cur:'USD',split:V?members(V):[],splitBy:'person'});break}
+    case 'edit-booking':editBooking({...find('bookings')});break;
+    case 'pay-booking':{const b=find('bookings');const paid=bookingPaid(b);const owing=Math.max(0,num(b.cost)-(b.cur===dispCur?paid:(b.cur==='USD'?paid/fx():paid*fx())));newExp({desc:b.title,amount:Math.round(owing*100)/100||'',cur:b.cur||'USD',cat:BTYPE_CAT[b.type]||'Other',bookingId:b.id,split:b.split||[],splitBy:b.splitBy||'person'});break}
+    case 'f-btype':F.bType=el.dataset.v;render(true);break;
+    case 'f-bstatus':F.bStatus=el.dataset.v;render(true);break;
+    case 'new-budget':editBudget({kind:el.dataset.kind||'fixed',cat:'Other',cur:'USD',qty:1,per:'',on:true});break;
+    case 'edit-budget':editBudget({...find('budget')});break;
+    case 'goto-setup':location.hash='#setup';break;
+    case 'new-exp':newExp();break;
+    case 'edit-exp':editExp({...find('expenses')});break;
+    case 'new-task':editTask({});break;
+    case 'edit-task':editTask({...find('tasks')});break;
+    case 'add-member':{const st=normSettings(ST());save('settings',normSettings({...st,travellers:[...st.travellers,{id:'t'+uid(),name:'Partner',party:el.dataset.p}]}));break}
+    case 'add-profile':{const st=normSettings(ST());const pid='p'+uid();save('settings',normSettings({...st,parties:[...st.parties,{id:pid,name:''}],travellers:[...st.travellers,{id:'t'+uid(),name:'Traveller '+(st.travellers.length+1),party:pid}]}));break}
+    case 'del-trav':{if(!el.dataset.sure){el.dataset.sure=1;el.textContent='Sure?';return}const st=normSettings(ST());save('settings',normSettings({...st,travellers:st.travellers.filter(t=>t.id!==id)}));break}
+    case 'copy-csv':{const rows=[['Date','Description','Category','Amount','Currency',`Amount ${dispCur}`,'Paid by','Split','Notes']].concat([...S.expenses].sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(x=>[x.date,x.desc,x.cat,x.amount,x.cur,expAmt(x).toFixed(2),tname(x.paidBy),splitLabel(x),x.notes||'']));
+      const csv=rows.map(r=>r.map(c=>`"${String(c??'').replace(/"/g,'""')}"`).join(',')).join('\n');copyText(csv,'Expenses copied — paste into Excel or Sheets');break}
+    case 'export':{const data=JSON.stringify({settings:S.settings,days:S.days,bookings:S.bookings,budget:S.budget,expenses:S.expenses,tasks:S.tasks},null,1);
+      showText('Backup',`<p class="muted small">Copy this and keep it somewhere safe (notes, email to yourself).</p><textarea class="code" readonly>${esc(data)}</textarea>`,[['Copy',()=>copyText(data,'Backup copied')]]);break}
+    case 'import':showText('Import backup',`<p class="muted small">Paste a backup. Entries with the same ID are overwritten; nothing else is deleted.</p><textarea class="code" id="imp"></textarea>`,[['Import',doImport]]);break;
+  }
+});
+document.addEventListener('change',e=>{
+  const el=e.target;
+  if(el.dataset.act==='toggle-opt'){const col=el.dataset.src==='booking'?'bookings':'budget';const r=S[col].find(x=>x.id===el.dataset.id);if(r)save(col,{...r,on:el.checked});return}
+  if(el.dataset.act==='toggle-task'){const r=S.tasks.find(x=>x.id===el.dataset.id);if(r)save('tasks',{...r,done:el.checked});return}
+  if(el.dataset.act==='f-ecat'){F.eCat=el.value;render(true);return}
+  if(el.dataset.act==='f-ewho'){F.eWho=el.value;render(true);return}
+  if(el.dataset.set){const st=ST();const k=el.dataset.set;let v=el.value;if(el.type==='number')v=num(v);if(st[k]===v)return;save('settings',{...st,[k]:v});return}
+  if(el.dataset.trav){const st=normSettings(ST());save('settings',{...st,travellers:st.travellers.map(t=>t.id===el.dataset.trav?{...t,name:el.value.trim()||t.name}:t)});return}
+  if(el.dataset.pest!==undefined){const st=normSettings(ST());const v=el.value===''?'':num(el.value);save('settings',{...st,parties:st.parties.map(p=>p.id===el.dataset.pest?{...p,nightEst:v}:p)});return}
+  if(el.dataset.pname!==undefined){const st=normSettings(ST());save('settings',{...st,parties:st.parties.map(p=>p.id===el.dataset.pname?{...p,name:el.value.trim()}:p)});return}
+  if(el.dataset.act==='view'){viewP=el.value;lsSet('view',viewP);render(true);return}
+});
+function copyText(txt,msg){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(()=>toast(msg),()=>toast('Copy blocked — select the text and copy manually'))}else toast('Copy blocked — select the text and copy manually')}
+function showText(title,html,btns){
+  const m=$('#modal');m.hidden=false;modalState={fields:[],data:{},onSave:()=>{}};
+  m.innerHTML=`<div class="dialog"><h2>${esc(title)}</h2>${html}<div class="foot">${btns.map((b,i)=>`<button class="btn ${i===btns.length-1?'pri':''}" data-tb="${i}">${b[0]}</button>`).join('')}<button class="btn" data-m="cancel">Close</button></div></div>`;
+  m.querySelectorAll('[data-tb]').forEach(b=>b.addEventListener('click',()=>btns[+b.dataset.tb][1]()));
+}
+async function doImport(){
+  let d;try{d=JSON.parse($('#imp').value)}catch(e){toast('That isn’t valid JSON');return}
+  if(!d||typeof d!=='object'){toast('Nothing to import');return}
+  closeModal();
+  if(d.settings)save('settings',d.settings);
+  let n=0;for(const c of COLS){if(Array.isArray(d[c]))for(const r of d[c]){if(r&&r.id&&typeof r==='object'){save(c,r);n++;if(mode==='db'&&n%20===0)await new Promise(r=>setTimeout(r,500))}}}
+  toast(`Imported ${n} entries`);
+}
+/* ---------- calendar drop-down for every date box ---------- */
+const fdl=s=>{const d=D(s);return d?`${WD[d.getUTCDay()]} ${d.getUTCDate()} ${MO[d.getUTCMonth()]} ${d.getUTCFullYear()}`:''};
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+function dateField(id,val,attrs=''){return `<div class="dp"><input type="hidden" id="${id}" value="${esc(val||'')}" ${attrs}><button type="button" class="dp-btn" data-dp="${id}" aria-haspopup="dialog">${val&&D(val)?esc(fdl(val)):'<span class="muted">Pick a date</span>'}<span aria-hidden="true">📅</span></button></div>`}
+let dpS=null;const dpEl=$('#dp');
+function dpBtn(){return dpS&&(dpS.btn.isConnected?dpS.btn:document.querySelector(`[data-dp="${dpS.id}"]`))}
+function openDP(btn){const id=btn.dataset.dp;const inp=document.getElementById(id);if(!inp)return;
+  const base=D(ST().start)||D(inp.value)||D(todayISO());if(dpS)dpBtn()?.classList.remove('open');
+  dpS={id,btn,y:base.getUTCFullYear(),m:base.getUTCMonth()};btn.classList.add('open');renderDP();dpEl.hidden=false;placeDP();}
+function closeDP(){if(!dpS)return;dpBtn()?.classList.remove('open');dpS=null;dpEl.hidden=true}
+function placeDP(){const b=dpBtn();if(!b){closeDP();return}const r=b.getBoundingClientRect();const w=dpEl.offsetWidth,h=dpEl.offsetHeight;
+  let left=Math.min(Math.max(8,r.left),window.innerWidth-w-8);let top=r.bottom+6;if(top+h>window.innerHeight-8&&r.top-h-6>8)top=r.top-h-6;
+  dpEl.style.left=left+'px';dpEl.style.top=Math.max(8,top)+'px'}
+function renderDP(){const {y,m,id}=dpS;const sel=(document.getElementById(id)||{}).value||'';const st=ST();const td=todayISO();const p2=n=>String(n).padStart(2,'0');
+  const off=(new Date(Date.UTC(y,m,1)).getUTCDay()+6)%7;const n=new Date(Date.UTC(y,m+1,0)).getUTCDate();let cells='';
+  for(let i=0;i<off;i++)cells+='<span></span>';
+  for(let d=1;d<=n;d++){const iso=`${y}-${p2(m+1)}-${p2(d)}`;const trip=st.start&&st.end&&iso>=st.start&&iso<=st.end;cells+=`<button type="button" data-dpd="${iso}" class="${iso===sel?'sel':''} ${iso===td?'today':''} ${trip?'trip':''}" aria-label="${fdl(iso)}">${d}</button>`}
+  dpEl.innerHTML=`<div class="dp-head"><button type="button" data-dpnav="-1" aria-label="Previous month">‹</button><b>${MONTHS[m]} ${y}</b><button type="button" data-dpnav="1" aria-label="Next month">›</button></div>
+  <div class="dp-wd">${['M','T','W','T','F','S','S'].map(x=>`<span>${x}</span>`).join('')}</div><div class="dp-grid">${cells}</div>
+  <div class="dp-foot"><button type="button" data-dpq="today">Today</button>${st.start?'<button type="button" data-dpq="start">Trip start</button>':''}<button type="button" data-dpq="clear">Clear</button></div>`}
+function pickDP(iso){const inp=document.getElementById(dpS.id);const b=dpBtn();closeDP();if(!inp)return;inp.value=iso;
+  if(b)b.innerHTML=(iso?esc(fdl(iso)):'<span class="muted">Pick a date</span>')+'<span aria-hidden="true">📅</span>';
+  inp.dispatchEvent(new Event('change',{bubbles:true}))}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-dp]');
+  if(b){e.preventDefault();e.stopPropagation();if(dpS&&dpS.id===b.dataset.dp)closeDP();else openDP(b);return}
+  if(dpS&&dpEl.contains(e.target)){e.stopPropagation();const t=e.target.closest('button');if(!t)return;
+    if(t.dataset.dpnav){dpS.m+=+t.dataset.dpnav;if(dpS.m<0){dpS.m=11;dpS.y--}if(dpS.m>11){dpS.m=0;dpS.y++}renderDP();placeDP()}
+    else if(t.dataset.dpd)pickDP(t.dataset.dpd);
+    else if(t.dataset.dpq==='today')pickDP(todayISO());else if(t.dataset.dpq==='start')pickDP(ST().start);else if(t.dataset.dpq==='clear')pickDP('');
+    return}
+  if(dpS)closeDP();
+},true);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&dpS){e.stopImmediatePropagation();closeDP()}},true);
+window.addEventListener('scroll',()=>{if(dpS)placeDP()},true);window.addEventListener('resize',()=>{if(dpS)placeDP()});
+window.addEventListener('online',()=>render(true));window.addEventListener('offline',()=>render(true));
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw',e)))}
+init();
+</script>
+</body>
+</html>
